@@ -14,7 +14,7 @@ This guide provides step-by-step instructions for setting up AutoGPT on Windows 
 - The first launch will finalize the setup. You'll be prompted to create a user account and password.
 
 #### 3. Download The Raw wizard.sh File
-- Navigate to [AGPT_WIZARD repository](https://github.com/NeonN3mesis/AGPT_WIZARD/blob/main/wizard.sh) and download the raw `wizard.sh` file.
+- Navigate to the [wizard.sh file](https://github.com/Significant-Gravitas/AutoGPT_Wizard/blob/master/wizard.sh) and download the raw `wizard.sh` file.
 - Right-click and copy the file.
 
 #### 4. Access Ubuntu's Home Directory in File Explorer
