@@ -1,0 +1,131 @@
+#!/bin/bash -e
+
+# ASCII Art
+cat << "EOF"
+                          .:=+*********************+=:.                          
+                         .+***************************+.                         
+                        .+*****************************+.                        
+                        .*******************************.                        
+                        .*******************************.                        
+                        .*******************************.                        
+                        .*******************************.                        
+                        .*******************************.                        
+                        .*******************************.                        
+   ..                   :*******************************:                   ..   
+.-++++-.               :***=::::=+*************+=::::=***:               .-++++-.
+=*=::-*=:::::::::.    .**+: .::. .=***********=. .::. :+**.    .:::::::::=*-::=*=
+*+    =***********:   -**- .+***- .***********. -***+. -**-   :***********=    +*
+=*=::=*=-------+**:   -**: .****- .***********. -****. :**-   :**+-------=*=::=*=
+ :=++=:.       -**:   :**+: .--. .=***********=. .--. :+**:   :**-       .:=++=: 
+               -**:    :***=:..:-+*************+-:..:=***:    :**-               
+               -**:     .=*****************************=.     :**-               
+               -**:       .:***+=***+=+***+=+***=+***:.       :**-               
+               -**:.........+*+. +**. -***- .**+ .+*+.........:**-               
+               =***+++++++++**+. +**. -***- .**+ .+**+++++++++***=               
+               :++++++++++++++-. +**. -***- .**+ .-++++++++++++++:               
+                                 +**. -***- .**+                                 
+                      .-------===+**. -***- .**+===-------.                      
+                      :************+. -***- .+************:                      
+                      :**=..........  -***-  ..........=**:                      
+                      :**=            -***-            =**:                      
+                     :=**+-.        .:+***+:.        .-+**=:                     
+                    :*+-:=*+.      .=*=:::=*=.      .+*=:-+*:                    
+                   .+*.   =#:      .*+     +*.      :#=   .*+.                   
+                    -*=:.-*+.      .+*-.:.-*+.      .+*-.:=*-                    
+                    .-+**+=.        .-+***+-.        .=+**+-.          
+EOF
+
+echo "Welcome to AutoGPT, This script will guide you through a standard setup."
+echo "Starting setup process..."
+
+# Function to update and upgrade system packages
+update_system() {
+    echo "Updating and upgrading system packages..."
+    sudo apt update && sudo apt upgrade -y
+}
+
+# Function to install dependencies
+install_dependencies() {
+    echo "Installing necessary dependencies..."
+    sudo apt-get install apt-transport-https ca-certificates curl gnupg2 software-properties-common -y
+}
+
+# Function to install Docker for Chrome OS
+install_docker() {
+    echo "Installing Docker..."
+    curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+    echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/debian $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+    sudo apt-get update
+    sudo apt-get install docker-ce docker-ce-cli containerd.io -y
+    sudo usermod -aG docker $USER
+}
+
+# Function to install Poetry
+install_poetry() {
+    echo "Installing Poetry..."
+    curl -sSL https://install.python-poetry.org | python3 -
+    if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
+        echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+        export PATH="$HOME/.local/bin:$PATH"
+    fi
+}
+
+# Function to clone and setup AutoGPT
+setup_autogpt() {
+    echo "Setting up AutoGPT..."
+    git clone https://github.com/Significant-Gravitas/AutoGPT.git
+    cd AutoGPT/autogpts/autogpt
+    ./setup
+
+    echo "Enter your OpenAI API key:"
+    read -r openai_api_key
+    sed -i "s/OPENAI_API_KEY=your-openai-api-key/OPENAI_API_KEY=${openai_api_key}/" .env.template
+
+    echo "Would you like to customize advanced settings? (y/N):"
+    read -r customize_settings
+    if [[ $customize_settings =~ ^[Yy]$ ]]; then
+        echo "Enter the SMART_LLM model (leave blank for default):"
+        read -r smart_llm
+        [ -n "$smart_llm" ] && sed -i "s/# SMART_LLM=.*/SMART_LLM=${smart_llm}/" .env.template
+
+        echo "Enter the FAST_LLM model (leave blank for default):"
+        read -r fast_llm
+        [ -n "$fast_llm" ] && sed -i "s/# FAST_LLM=.*/FAST_LLM=${fast_llm}/" .env.template
+
+        # Additional customizations can be added here
+    fi
+
+    mv .env.template .env
+
+    echo "AutoGPT setup is complete. Please restart your session."
+    echo "After restarting, run the following command:"
+    echo "sudo systemctl start docker && cd ~/AutoGPT/autogpts/autogpt && ./autogpt.sh serve"
+}
+
+# Main script execution
+{
+    # Optional system update with user confirmation
+    read -p "Do you want to update and upgrade the system packages? (y/N): " -n 1 -r
+    echo
+    [[ $REPLY =~ ^[Yy]$ ]] && update_system
+
+    # Ask before installing dependencies
+    read -p "Do you want to install necessary dependencies? (y/N): " -n 1 -r
+    echo
+    [[ $REPLY =~ ^[Yy]$ ]] && install_dependencies
+
+    # Ask before installing Docker
+    read -p "Do you want to install Docker? (y/N): " -n 1 -r
+    echo
+    [[ $REPLY =~ ^[Yy]$ ]] && install_docker
+
+    # Ask before installing Poetry
+    read -p "Do you want to install Poetry? (y/N): " -n 1 -r
+    echo
+    [[ $REPLY =~ ^[Yy]$ ]] && install_poetry
+
+    # Setup AutoGPT
+    setup_autogpt
+
+    echo "Setup complete."
+}
