@@ -1,6 +1,6 @@
 # ChromeOS Wizard Script
 
-This repository contains the `chromewizard.sh` Bash script, designed to automate the setup of various tools and dependencies on Chrome OS systems, including Docker and Poetry, and to configure AutoGPT.
+This folder contains the `chromewizard.sh` Bash script, designed to automate the setup of various tools and dependencies on Chrome OS systems, including Docker and Poetry, and to configure AutoGPT.
 
 ## Enabling Linux on Chrome OS
 
