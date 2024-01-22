@@ -13,6 +13,9 @@ This guide provides step-by-step instructions for setting up AutoGPT on Windows 
 - Launch Ubuntu from the Start menu.
 - The first launch will finalize the setup. You'll be prompted to create a user account and password.
 
+#### 2 1/2. Switch to WSL 2
+-Upgrade version from WSL 1 to WSL 2 To change versions, use the command: wsl --set-version <distro name> 2 replacing <distro name> with the name of the Linux distribution that you want to update. For example, wsl --set-version Ubuntu-20.04 2 will set your Ubuntu 20.04 distribution to use WSL 2.
+
 #### 3. Download The Raw wizard.sh File
 - Navigate to the [wizard.sh file](https://github.com/Significant-Gravitas/AutoGPT_Wizard/blob/master/wizard.sh) and download the raw `wizard.sh` file.
 - Right-click and copy the file.
